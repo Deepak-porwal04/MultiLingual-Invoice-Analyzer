@@ -21,7 +21,7 @@ def input_image_processing(uploaded_file):
 
         image_parts = [
             {
-                "mime_type": uploaded_file.type  # get the mime type of the image
+                "mime_type": uploaded_file.type,  # get the mime type of the image
                 "data": bytes_data
             }
         ]
