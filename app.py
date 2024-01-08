@@ -3,7 +3,6 @@ import os
 from PIL import Image
 import google.generativeai as gai
 from dotenv import load_dotenv
-import time
 
 # 1. Load API key and model ───────────────────────────────────────────────────────
 # Load the API key from environment variables
