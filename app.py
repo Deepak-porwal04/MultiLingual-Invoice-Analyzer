@@ -1,58 +1,93 @@
-from dotenv import load_dotenv
-
-load_dotenv()
-
 import streamlit as st
 import os
 from PIL import Image
 import google.generativeai as gai
+from dotenv import load_dotenv
+import time
 
+# 1. Load API key and model ───────────────────────────────────────────────────────
+# Load the API key from environment variables
+load_dotenv()
 gai.configure(api_key=os.environ.get("API_KEY"))
 
+# Initialize the generative model
 model = gai.GenerativeModel("gemini-pro-vision")
 
-def get_response(system_role_input, image, user_query_prompt):
-    response = model.generate_content([system_role_input,image[0], user_query_prompt])
+# 2. Define functions for invoice processing and response generation ─────────────
+def generate_response_from_invoice_and_query(invoice_data, user_query, role_prompt):
+    """Generates a response to a user query based on the provided invoice image and role prompt.
+
+    Args:
+        invoice_data: A list containing a dictionary with image data (mime_type and data).
+        user_query: The user's query prompt.
+        role_prompt: A prompt describing the system's role and capabilities.
+
+    Returns:
+        The generated response text.
+    """
+
+    response = model.generate_content([role_prompt, invoice_data[0], user_query])
     return response.text
 
-def input_image_processing(uploaded_file):
+def process_uploaded_invoice_image(uploaded_file):
+    """Processes an uploaded invoice image and prepares it for the model.
+
+    Args:
+        uploaded_file: The uploaded file object.
+
+    Returns:
+        A list containing a dictionary with image data (mime_type and data).
+
+    Raises:
+        FileExistsError: If no file is uploaded.
+    """
+
     if uploaded_file is not None:
         bytes_data = uploaded_file.getvalue()
-
         image_parts = [
             {
-                "mime_type": uploaded_file.type,  # get the mime type of the image
+                "mime_type": uploaded_file.type,  # Get the mime type of the image
                 "data": bytes_data
             }
         ]
         return image_parts
     else:
         raise FileExistsError("No file uploaded")
-    
-# Streamlit Setup
 
-st.set_page_config(page_title="MultiLingual-Invoice-Analyzer")
+# 3. Set up Streamlit interface ─────────────────────────────────────────────────
+st.set_page_config(page_title="Multilingual Invoice Analyzer")
 
 st.header("Invoice Analyzer")
-user_prompt = st.text_input("Input prompt: ",key='input')
-uploaded_file = st.file_uploader("Choose an invoice image: ",type=["jpg","jpeg","png"])
 
-image = ""
-if uploaded_file is not None:
-    image = Image.open(uploaded_file)
-    st.image(image,caption="uploaded invoice",use_column_width=True)
+# 4. Get user input and display uploaded image ──────────────────────────────────
+user_query = st.text_input("Enter your query about the invoice:", key='input')
+uploaded_invoice = st.file_uploader("Upload invoice image:", type=["jpg", "jpeg", "png"])
 
-submit = st.button("Analyze the invoice")
+if uploaded_invoice is not None:
+    invoice_image = Image.open(uploaded_invoice)
+    st.image(invoice_image, caption="Uploaded invoice", use_column_width=True)
 
+# 5. Define system role prompt ─────────────────────────────────────────────────
 system_role = """
-You are an expert to understand the invoices in any language.
-Based on the given query you have to analyze the invoice and give a correct response of the query.
+I am an expert in understanding invoices in various languages. 
+I will carefully analyze the invoice and provide accurate responses to your queries.
+Feel free to ask me anything about the invoice, such as:
+- Total amount due
+- Invoice date
+- Vendor information
+- Specific line items
+- Payment terms
+- Tax details
+- Any other relevant information
 """
 
-# if button is clicked
-
-if submit:
-    image_data = input_image_processing(uploaded_file)
-    response = get_response(system_role,image_data,user_prompt)
-    st.subheader("The response is: ")
-    st.write(response)
+# 6. Handle user interaction and generate response ─────────────────────────────
+if st.button("Analyze Invoice"):
+    with st.spinner("Processing invoice..."):  # Replace with st.empty for custom progress bar
+        try:
+            invoice_data = process_uploaded_invoice_image(uploaded_invoice)
+            response = generate_response_from_invoice_and_query(invoice_data, user_query, system_role)
+            st.subheader("Response:")
+            st.write(response)
+        except FileExistsError as e:
+            st.error(e)
