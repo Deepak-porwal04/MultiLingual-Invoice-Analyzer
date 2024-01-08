@@ -1,3 +1,9 @@
+"""
+This module include multiline strings that serves as a prompt, defining the system's role and capabilities etc.
+
+The module is designed to support multiple prompts, allowing for flexibility in guiding the model's responses.
+"""
+
 system_role = """
 [Image of an invoice in any language]
 
