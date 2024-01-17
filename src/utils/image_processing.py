@@ -28,4 +28,4 @@ Raises:
         return image_parts
     else:
         # Raise an exception if no file is uploaded
-        raise FileExistsError("No file uploaded")
+        raise FileNotFoundError("No file uploaded")

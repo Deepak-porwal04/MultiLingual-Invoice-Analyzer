@@ -9,9 +9,6 @@ def initialize_generative_model(model_name):
 
     Returns:
         gai.GenerativeModel: The initialized model instance.
-
-    Raises:
-        ImportError: If the `google.generativeai` module is not found.
     """
     model = gai.GenerativeModel(model_name)
     return model
