@@ -10,6 +10,7 @@ This project enables users to analyze invoice images in various languages and ex
 - [Installation](#installation)
 - [Prerequisites](#prerequisites)
 - [Usage](#Usage)
+- [Application Screenshots](#application-screenshots)
 
 ## Key Features
 - **Multilingual invoice analysis**: Handles invoices in multiple languages with the help of Gemini Pro Vision.
@@ -56,3 +57,8 @@ API_KEY=your_gemini_api_key
 3. Upload an invoice image (in JPG, JPEG, or PNG format).
 4. Click the "Analyze Invoice" button.
 5. The system will process the invoice and provide a response based on the query.
+
+## Application Screenshots
+
+### Home Page
+![Home Page](src/images/1.png)
